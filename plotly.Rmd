@@ -1,0 +1,53 @@
+---
+title: "plotly.Rmd"
+author: "Yeyi Zhang"
+date: "11/1/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Dataset
+```{r}
+library(tidyverse)
+library(janitor)
+library(stringr)
+library(forcats)
+library(viridis)
+
+library(plotly)
+```
+
+```{r}
+airbnb = read_csv("./data/nyc_airbnb.zip") %>% 
+  clean_names() %>% 
+  rename(boro = neighbourhood_group) %>% 
+  filter(boro == "Manhattan",
+         price > 100 & price < 400)
+```
+
+```{r}
+airbnb %>% 
+  mutate(text_label = str_c("Price: $", price, '\nRating: ', rating)) %>% 
+  plot_ly(x = ~longitude, y = ~latitude,
+          type = "scatter", mode = "marker", 
+          alpha = 0.5, color = ~price,
+          text = ~text_label)
+```
+
+```{r}
+airbnb %>% 
+  mutate(neighbourhood = fct_reorder(neighbourhood, price)) %>%
+  plot_ly(y = ~price, color = ~neighbourhood, type = "box",
+          colors = "Set2")
+```
+
+```{r}
+airbnb %>% 
+  count(neighbourhood, sort = TRUE) %>% 
+  mutate(neighbourhood = fct_reorder(neighbourhood, price)) %>%
+  plot_ly(y = ~price, color = ~neighbourhood, type = "box",
+          colors = "Set2")
+```
