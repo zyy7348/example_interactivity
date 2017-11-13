@@ -24,30 +24,53 @@ library(plotly)
 airbnb = read_csv("./data/nyc_airbnb.zip") %>% 
   clean_names() %>% 
   rename(boro = neighbourhood_group) %>% 
+  mutate(rating = review_scores_location / 2) %>% 
   filter(boro == "Manhattan",
+         room_type == "Entire home/apt",
          price > 100 & price < 400)
 ```
 
-```{r}
-airbnb %>% 
-  mutate(text_label = str_c("Price: $", price, '\nRating: ', rating)) %>% 
-  plot_ly(x = ~longitude, y = ~latitude,
-          type = "scatter", mode = "marker", 
-          alpha = 0.5, color = ~price,
-          text = ~text_label)
-```
+### Plotly Scatterplot
 
 ```{r}
 airbnb %>% 
-  mutate(neighbourhood = fct_reorder(neighbourhood, price)) %>%
-  plot_ly(y = ~price, color = ~neighbourhood, type = "box",
-          colors = "Set2")
+  mutate(hover_text = str_c("Price: $", price, '\nRating: ', rating)) %>% 
+  plot_ly(x = ~longitude, y = ~latitude, color = ~price,
+          text = ~hover_text,
+          type = "scatter", mode = "marker", alpha = 0.5)
 ```
+
+
+### Plotly boxplot
 
 ```{r}
 airbnb %>% 
-  count(neighbourhood, sort = TRUE) %>% 
-  mutate(neighbourhood = fct_reorder(neighbourhood, price)) %>%
-  plot_ly(y = ~price, color = ~neighbourhood, type = "box",
-          colors = "Set2")
+  mutate(neighbourhood = fct_reorder(neighbourhood, price)) %>% 
+  plot_ly(x = ~neighbourhood, y = ~price, color = ~neighbourhood,
+          colors = "Set2",
+          type = "box")
 ```
+
+### Plotly bar chart
+
+```{r}
+airbnb %>% 
+  count(neighbourhood) %>% 
+  mutate(neighbourhood = fct_reorder(neighbourhood, n)) %>% 
+  plot_ly(x = ~neighbourhood, y = ~n, color = ~neighbourhood, 
+          type = "bar")
+```
+
+### ggplotly
+
+```{r}
+scatter_plot = airbnb %>% 
+  ggplot(aes(x = longitude, y = latitude, color = price)) +
+  geom_point(alpha = 0.25) +
+  scale_color_viridis() +
+  coord_cartesian() +
+  theme_classic()
+
+ggplotly(scatter_plot)
+```
+
