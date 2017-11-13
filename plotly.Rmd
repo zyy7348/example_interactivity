@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Dataset
+
 ```{r}
 library(tidyverse)
 library(janitor)
@@ -19,6 +20,8 @@ library(viridis)
 
 library(plotly)
 ```
+
+clean data.
 
 ```{r}
 airbnb = read_csv("./data/nyc_airbnb.zip") %>% 
@@ -34,7 +37,7 @@ airbnb = read_csv("./data/nyc_airbnb.zip") %>%
 
 ```{r}
 airbnb %>% 
-  mutate(hover_text = str_c("Price: $", price, '\nRating: ', rating)) %>% 
+  mutate(hover_text = str_c("Price: $", price, '\nRating: ', rating)) %>% ## \n create a new line
   plot_ly(x = ~longitude, y = ~latitude, color = ~price,
           text = ~hover_text,
           type = "scatter", mode = "marker", alpha = 0.5)
